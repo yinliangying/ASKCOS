@@ -166,7 +166,7 @@ def print_at_depth(chemical_node, depth=1, writefunc=lambda x: print(x), delim='
     if chemical_node['children']:
         rxn = chemical_node['children'][0]
         if img:
-            writefunc('{}<img src="http://askcos.mit.edu/draw/reaction/{}">'.format(
+            writefunc('{}<img molecular_design="http://askcos.mit.edu/draw/reaction/{}">'.format(
                 (depth*4+4)*delim, rxn['smiles']))
         writefunc('{}smiles : {}'.format((depth*4+4)*delim, rxn['smiles']))
         writefunc('{}num ex : {}'.format(
