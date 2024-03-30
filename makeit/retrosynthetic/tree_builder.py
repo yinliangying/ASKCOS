@@ -188,7 +188,7 @@ class TreeBuilder:
         self.reset()
 
         # When not using Celery, need to ensure retroTransformer initialized
-        """
+        #"""
         if not self.celery:
             if retroTransformer:
                 self.retroTransformer = retroTransformer
@@ -202,10 +202,11 @@ class TreeBuilder:
                 self.mincount=mincount
                 self.mincount_chiral=mincount_chiral
                 self.chiral=chiral
-
         self.retroTransformer=Retro(mincount=self.mincount,
                                     mincount_chiral=self.mincount_chiral,
                                      chiral=self.chiral)
+        """
+
 
 
         # Define method to check if all results processed
@@ -591,7 +592,7 @@ class TreeBuilder:
                     (_id, smiles) = self.expansion_queues[j].get(timeout=0.1)  # short timeout
                     self.idle[i] = False
                     # print('Worker {} grabbed {} (ID {}) to expand from queue {}'.format(i, smiles, _id, j))
-                    """
+                    #"""
                     result = self.retroTransformer.get_outcomes(smiles, self.mincount, (self.precursor_prioritization,
                                                                                         self.template_prioritization),
                                                                 template_count=self.template_count,
@@ -601,10 +602,18 @@ class TreeBuilder:
                                                                 filter_threshold=self.filter_threshold
                                                                 )
 
-                    precursors = result.return_top(n=self.max_branching)
-                    """
+                    old_precursors = result.return_top(n=self.max_branching)
+                    #"""
+                    g2g_precursors = get_ASKCOS_one_step_retro_topN(smiles, self.max_branching)
+                    import copy
+                    min_len=min(len(old_precursors),len(precursors))
+                    precursors=[]
+                    for i in range(min_len):
+                        item=copy.deepcopy(old_precursors[i])
+                        item["smiles"]=g2g_precursors[i]["smiles"]
+                        item["smiles_split"]=g2g_precursors[i]["smiles_split"]
+                        item['necessary_reagent']=g2g_precursors[i]['necessary_reagent']
 
-                    precursors = get_ASKCOS_one_step_retro_topN(smiles,self.max_branching)
                     print(precursors)
                     self.results_queue.put((_id, smiles, precursors))
 
