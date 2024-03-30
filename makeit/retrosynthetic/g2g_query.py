@@ -9,7 +9,7 @@ def send_get_request(path, query_params=None):
         url += "?" + "&".join(["%s=%s"%(key,value) for key, value in query_params.items()])
     conn.request("GET", url)
     response = conn.getresponse()
-    print(f"Response Status: {response.status}")
+    print("Response Status: %s"%(response.status))
     return response.read().decode('utf-8')
 
 def get_ASKCOS_one_step_retro_topN(smiles,topN):
