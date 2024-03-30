@@ -579,16 +579,51 @@ class TreeBuilder:
                     (_id, smiles) = self.expansion_queues[j].get(timeout=0.1)  # short timeout
                     self.idle[i] = False
                     # print('Worker {} grabbed {} (ID {}) to expand from queue {}'.format(i, smiles, _id, j))
-                    result = self.retroTransformer.get_outcomes(smiles, self.mincount, (self.precursor_prioritization,
-                                                                                        self.template_prioritization),
-                                                                template_count=self.template_count,
-                                                                mode=self.precursor_score_mode,
-                                                                max_cum_prob=self.max_cum_template_prob,
-                                                                apply_fast_filter=self.apply_fast_filter,
-                                                                filter_threshold=self.filter_threshold
-                                                                )
+                    # result = self.retroTransformer.get_outcomes(smiles, self.mincount, (self.precursor_prioritization,
+                    #                                                                     self.template_prioritization),
+                    #                                             template_count=self.template_count,
+                    #                                             mode=self.precursor_score_mode,
+                    #                                             max_cum_prob=self.max_cum_template_prob,
+                    #                                             apply_fast_filter=self.apply_fast_filter,
+                    #                                             filter_threshold=self.filter_threshold
+                    #                                             )
+                    #
+                    # precursors = result.return_top(n=self.max_branching)
+                    import http.client
+                    from urllib.parse import quote
+                    import json
+                    # 发送 GET 请求到服务器
+                    def send_get_request(path, query_params=None):
+                        conn = http.client.HTTPConnection("localhost", 8000)
+                        url = path
+                        if query_params:
+                            url += "?" + "&".join([f"{key}={value}" for key, value in query_params.items()])
+                        conn.request("GET", url)
+                        response = conn.getresponse()
+                        print(f"Response Status: {response.status}")
+                        return response.read().decode('utf-8')
 
-                    precursors = result.return_top(n=self.max_branching)
+                    def get_ASKCOS_one_step_retro_topN(smiles):
+                        json_str = json.dumps(
+                            {"smiles_list": [smiles]})
+                        encoded_value = quote(json_str)
+                        json_str = send_get_request("/", {"encoded_value": encoded_value})
+                        result_list = json.loads(json_str)
+                        condicate_smiles_list = result_list[0]
+
+                        return_list = []
+                        for idx, r_smiles in enumerate(condicate_smiles_list):
+                            r_smiles_list = r_smiles.split(".")
+                            data = {'necessary_reagent': "",
+                                    'tforms': [],
+                                    'plausibility': 0.9,
+                                    'template_score': 0.01,
+                                    'rank': idx + 1,
+                                    'num_examples': 100,
+                                    'smiles_split': r_smiles_list,
+                                    'smiles': r_smiles, 'score': -1000 * idx}
+                            return_list.append(data)
+                        return return_list
 
                     self.results_queue.put((_id, smiles, precursors))
 
