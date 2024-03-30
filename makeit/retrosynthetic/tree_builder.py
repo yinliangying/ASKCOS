@@ -197,10 +197,15 @@ class TreeBuilder:
                                                                             mincount_chiral=self.mincount_chiral,
                                                                              chiral=self.chiral)
         """
-        self.retroTransformer=object()
-        self.retroTransformer.mincount=self.mincount
-        self.retroTransformer.mincount_chiral=self.mincount_chiral
-        self.retroTransformer.chiral=self.chiral
+        class Retro:
+            def __init__(self,mincount,mincount_chiral,chiral):
+                self.mincount=mincount
+                self.mincount_chiral=mincount_chiral
+                self.chiral=chiral
+
+        self.retroTransformer=Retro(mincount=self.mincount,
+                                    mincount_chiral=self.mincount_chiral,
+                                     chiral=self.chiral)
 
 
         # Define method to check if all results processed
