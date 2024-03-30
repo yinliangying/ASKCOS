@@ -18,7 +18,7 @@ from makeit.utilities.formats import chem_dict, rxn_dict
 import askcos_site.askcos_celery.treebuilder.tb_worker as tb_worker
 import askcos_site.askcos_celery.treebuilder.tb_c_worker as tb_c_worker
 treebuilder_loc = 'tree_builder'
-
+from makeit.retrosynthetic.g2g_query import get_ASKCOS_one_step_retro_topN
 
 class TreeBuilder:
     """Class for retrosynthetic tree expansion using a depth-first search.
@@ -188,13 +188,20 @@ class TreeBuilder:
         self.reset()
 
         # When not using Celery, need to ensure retroTransformer initialized
+        """
         if not self.celery:
             if retroTransformer:
                 self.retroTransformer = retroTransformer
             else:
                 self.retroTransformer = model_loader.load_Retro_Transformer(mincount=self.mincount,
                                                                             mincount_chiral=self.mincount_chiral,
-                                                                            chiral=self.chiral)
+                                                                             chiral=self.chiral)
+        """
+        self.retroTransformer=object()
+        self.retroTransformer.mincount=self.mincount
+        self.retroTransformer.mincount_chiral=self.mincount_chiral
+        self.retroTransformer.chiral=self.chiral
+
 
         # Define method to check if all results processed
         if self.celery:
@@ -579,52 +586,21 @@ class TreeBuilder:
                     (_id, smiles) = self.expansion_queues[j].get(timeout=0.1)  # short timeout
                     self.idle[i] = False
                     # print('Worker {} grabbed {} (ID {}) to expand from queue {}'.format(i, smiles, _id, j))
-                    # result = self.retroTransformer.get_outcomes(smiles, self.mincount, (self.precursor_prioritization,
-                    #                                                                     self.template_prioritization),
-                    #                                             template_count=self.template_count,
-                    #                                             mode=self.precursor_score_mode,
-                    #                                             max_cum_prob=self.max_cum_template_prob,
-                    #                                             apply_fast_filter=self.apply_fast_filter,
-                    #                                             filter_threshold=self.filter_threshold
-                    #                                             )
-                    #
-                    # precursors = result.return_top(n=self.max_branching)
-                    import http.client
-                    from urllib.parse import quote
-                    import json
-                    # 发送 GET 请求到服务器
-                    def send_get_request(path, query_params=None):
-                        conn = http.client.HTTPConnection("localhost", 8000)
-                        url = path
-                        if query_params:
-                            url += "?" + "&".join([f"{key}={value}" for key, value in query_params.items()])
-                        conn.request("GET", url)
-                        response = conn.getresponse()
-                        print(f"Response Status: {response.status}")
-                        return response.read().decode('utf-8')
+                    """
+                    result = self.retroTransformer.get_outcomes(smiles, self.mincount, (self.precursor_prioritization,
+                                                                                        self.template_prioritization),
+                                                                template_count=self.template_count,
+                                                                mode=self.precursor_score_mode,
+                                                                max_cum_prob=self.max_cum_template_prob,
+                                                                apply_fast_filter=self.apply_fast_filter,
+                                                                filter_threshold=self.filter_threshold
+                                                                )
 
-                    def get_ASKCOS_one_step_retro_topN(smiles):
-                        json_str = json.dumps(
-                            {"smiles_list": [smiles]})
-                        encoded_value = quote(json_str)
-                        json_str = send_get_request("/", {"encoded_value": encoded_value})
-                        result_list = json.loads(json_str)
-                        condicate_smiles_list = result_list[0]
+                    precursors = result.return_top(n=self.max_branching)
+                    """
 
-                        return_list = []
-                        for idx, r_smiles in enumerate(condicate_smiles_list):
-                            r_smiles_list = r_smiles.split(".")
-                            data = {'necessary_reagent': "",
-                                    'tforms': [],
-                                    'plausibility': 0.9,
-                                    'template_score': 0.01,
-                                    'rank': idx + 1,
-                                    'num_examples': 100,
-                                    'smiles_split': r_smiles_list,
-                                    'smiles': r_smiles, 'score': -1000 * idx}
-                            return_list.append(data)
-                        return return_list
-
+                    precursors = get_ASKCOS_one_step_retro_topN(smiles,self.max_branching)
+                    print(precursors)
                     self.results_queue.put((_id, smiles, precursors))
 
 
