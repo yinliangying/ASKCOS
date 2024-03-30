@@ -28,6 +28,7 @@ from rdchiral.initialization import rdchiralReaction, rdchiralReactants
 retro_transformer_loc = 'retro_transformer'
 
 
+
 class RetroTransformer(TemplateTransformer):
     """Defines an object to perform one-step retrosyntheses for a molecule.
 
