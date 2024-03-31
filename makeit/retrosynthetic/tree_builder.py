@@ -616,7 +616,7 @@ class TreeBuilder:
                                     {'rank': 10, 'plausibility': 0.98406982421875, 'necessary_reagent': '[O]', 'template_score': 0.0020493303891271353, 'tforms': ['59c5128105581eb9f5761f21'], 'smiles': 'CCC12CC1(C)C(=N)O2', 'smiles_split': ['CCC12CC1(C)C(=N)O2'], 'num_examples': 197, 'score': -34009.615446333606}]
                     g2g_precursors = get_ASKCOS_one_step_retro_topN(smiles, self.max_branching)
                     import copy
-                    min_len=min(len(old_precursors),len(precursors))
+                    min_len=min(len(old_precursors),len(g2g_precursors))
                     precursors=[]
                     for i in range(min_len):
                         item=copy.deepcopy(old_precursors[i])
