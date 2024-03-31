@@ -188,7 +188,7 @@ class TreeBuilder:
         self.reset()
 
         # When not using Celery, need to ensure retroTransformer initialized
-        """
+        #"""
         if not self.celery:
             if retroTransformer:
                 self.retroTransformer = retroTransformer
@@ -205,7 +205,7 @@ class TreeBuilder:
         self.retroTransformer=Retro(mincount=self.mincount,
                                     mincount_chiral=self.mincount_chiral,
                                      chiral=self.chiral)
-        #"""
+        """
 
 
 
@@ -592,7 +592,7 @@ class TreeBuilder:
                     (_id, smiles) = self.expansion_queues[j].get(timeout=0.1)  # short timeout
                     self.idle[i] = False
                     # print('Worker {} grabbed {} (ID {}) to expand from queue {}'.format(i, smiles, _id, j))
-                    """
+                    #"""
                     result = self.retroTransformer.get_outcomes(smiles, self.mincount, (self.precursor_prioritization,
                                                                                         self.template_prioritization),
                                                                 template_count=self.template_count,
@@ -614,6 +614,7 @@ class TreeBuilder:
                                     {'rank': 8, 'plausibility': 0.787665069103241, 'necessary_reagent': '', 'template_score': 0.003980881068855524, 'tforms': ['59c51a8905581eb9f57b7643'], 'smiles': 'CCC12CC1(C)[C@@H](O)O2', 'smiles_split': ['CCC12CC1(C)[C@@H](O)O2'], 'num_examples': 203, 'score': -17759.118454906253},
                                     {'rank': 9, 'plausibility': 0.9360624551773071, 'necessary_reagent': '', 'template_score': 0.0025344882160425186, 'tforms': ['59c5122005581eb9f575c1fa'], 'smiles': 'CCC12CC1(CI)C(=O)O2', 'smiles_split': ['CCC12CC1(CI)C(=O)O2'], 'num_examples': 562, 'score': -30752.75361973081},
                                     {'rank': 10, 'plausibility': 0.98406982421875, 'necessary_reagent': '[O]', 'template_score': 0.0020493303891271353, 'tforms': ['59c5128105581eb9f5761f21'], 'smiles': 'CCC12CC1(C)C(=N)O2', 'smiles_split': ['CCC12CC1(C)C(=N)O2'], 'num_examples': 197, 'score': -34009.615446333606}]
+                    """
                     g2g_precursors = get_ASKCOS_one_step_retro_topN(smiles, self.max_branching)
                     import copy
                     min_len=min(len(old_precursors),len(g2g_precursors))
@@ -624,6 +625,9 @@ class TreeBuilder:
                         item["smiles_split"]=g2g_precursors[tmp_i]["smiles_split"]
                         item['necessary_reagent']=g2g_precursors[tmp_i]['necessary_reagent']
 
+                    #precursors=old_precursors
+                    print(old_precursors)
+                    print(g2g_precursors)
                     print(precursors)
                     self.results_queue.put((_id, smiles, precursors))
 
