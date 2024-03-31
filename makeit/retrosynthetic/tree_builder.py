@@ -624,11 +624,12 @@ class TreeBuilder:
                         item["smiles"]=g2g_precursors[tmp_i]["smiles"]
                         item["smiles_split"]=g2g_precursors[tmp_i]["smiles_split"]
                         item['necessary_reagent']=g2g_precursors[tmp_i]['necessary_reagent']
+                        precursors.append(item)
 
-                    #precursors=old_precursors
                     print(old_precursors)
                     print(g2g_precursors)
                     print(precursors)
+                    # precursors=old_precursors
                     self.results_queue.put((_id, smiles, precursors))
 
 
