@@ -618,11 +618,11 @@ class TreeBuilder:
                     import copy
                     min_len=min(len(old_precursors),len(g2g_precursors))
                     precursors=[]
-                    for i in range(min_len):
-                        item=copy.deepcopy(old_precursors[i])
-                        item["smiles"]=g2g_precursors[i]["smiles"]
-                        item["smiles_split"]=g2g_precursors[i]["smiles_split"]
-                        item['necessary_reagent']=g2g_precursors[i]['necessary_reagent']
+                    for tmp_i in range(min_len):
+                        item=copy.deepcopy(old_precursors[tmp_i])
+                        item["smiles"]=g2g_precursors[tmp_i]["smiles"]
+                        item["smiles_split"]=g2g_precursors[tmp_i]["smiles_split"]
+                        item['necessary_reagent']=g2g_precursors[tmp_i]['necessary_reagent']
 
                     print(precursors)
                     self.results_queue.put((_id, smiles, precursors))
