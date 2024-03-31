@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 from pathlib import Path
 from dp.launching.typing import BaseModel, Field,Boolean, OutputDirectory,InputFilePath, Int,  Union, String, Literal, Field, Enum
 from dp.launching.cli import SubParser,default_minimal_exception_handler,run_sp_and_exit,to_runner
@@ -7,11 +8,12 @@ from dp.launching.cli import SubParser,default_minimal_exception_handler,run_sp_
 import pandas as pd
 def retrosynthesis_func(mol_file, predicting_reaction_condition, output_dir):
     os.system("mkdir -p %s" % (output_dir))
-    cmd_str=f" export PYTHONPATH=$PYTHONPATH:/root/Uni-Electrolyte/retrosynthesis/ASKCOS2:/root/Uni-Electrolyte/retrosynthesis/ASKCOS2/askcos && \
-     cd /root/Uni-Electrolyte/retrosynthesis/g2gretro/ && nohup sh -x start_server.sh& && sleep 10 && \
-      /root/miniconda3/envs/ASKCOS_0.3.1/bin/python /root/Uni-Electrolyte/retrosynthesis/ASKCOS2/tree_builder_bohrium_task.py  --input_csv_file {mol_file}  --output_dir {output_dir}  --predicting_reaction_condition {predicting_reaction_condition} "
-    print(cmd_str)
-    os.system( cmd_str    )
+
+    os.system(" cd /root/Uni-Electrolyte/retrosynthesis/g2gretro/ &&nohup sh -x start_server.sh &")
+    time.sleep(10)
+    os.system( f" export PYTHONPATH=\"$PYTHONPATH:/root/Uni-Electrolyte/retrosynthesis/ASKCOS2:/root/Uni-Electrolyte/retrosynthesis/ASKCOS2/askcos\" && /root/miniconda3/envs/ASKCOS_0.3.1/bin/python \
+    /root/Uni-Electrolyte/retrosynthesis/ASKCOS2/tree_builder_bohrium_task.py  --input_csv_file {mol_file}  \
+    --output_dir {output_dir}  --predicting_reaction_condition {predicting_reaction_condition} ")
 
     if not os.path.exists(f"{output_dir}/finish"):
         raise Exception("task failed")
