@@ -477,8 +477,11 @@ def test_accuracy(retro_transformer,test_csv_path,beam_size):
 
         src_smiles=line["src_smiles"]
         tgt_smiles=line["tgt_smiles"]
-
-        outcomes = retro_transformer.get_outcomes(src_smiles, beam_size, (gc.relevanceheuristic, gc.relevance))
+        try:
+            outcomes = retro_transformer.get_outcomes(src_smiles, beam_size, (gc.relevanceheuristic, gc.relevance))
+        except:
+            print(src_smiles)
+            continue
         generation=[k["smiles"] for k in outcomes.return_top(n=beam_size)]
         #if len(generation)==10:
         generations.append(generation)
