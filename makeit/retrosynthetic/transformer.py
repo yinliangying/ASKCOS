@@ -471,23 +471,22 @@ def test_accuracy(retro_transformer,test_csv_path,beam_size):
     ground_truths=[]
     generations=[]
     src_smiles_list=[]
-    for idx,line in enumerate(df.iterrows()):
-        print(idx)
-        if idx>100:
-            break
+    for idx,line in  df.iterrows() :
+        if idx%50==0:
+            print(idx)
 
         src_smiles=line["src_smiles"]
         tgt_smiles=line["tgt_smiles"]
 
         outcomes = retro_transformer.get_outcomes(src_smiles, beam_size, (gc.relevanceheuristic, gc.relevance))
         generation=[k["smiles"] for k in outcomes.return_top(n=beam_size)]
-        if len(generation)==10:
-            generations.append(generation)
-            src_smiles_list.append(src_smiles)
-            ground_truths.append(tgt_smiles)
+        #if len(generation)==10:
+        generations.append(generation)
+        src_smiles_list.append(src_smiles)
+        ground_truths.append(tgt_smiles)
 
     accuracy_matrix = np.zeros((len(ground_truths),  beam_size))
-    accuracy_matrix2=np.zeros(beam_size,2) #第0列命中数 第1列总数
+    accuracy_matrix2=np.zeros((beam_size,2)) #第0列命中数 第1列总数
     for i in range(len(ground_truths)):
         gt_i = canonical_smiles(ground_truths[i])
         generation_i = [canonical_smiles(gen) for gen in generations[i]]
@@ -505,10 +504,10 @@ def test_accuracy(retro_transformer,test_csv_path,beam_size):
         pickle.dump((ground_truths, generations), f)
 
     for j in range(beam_size):
+        print('Top-{}: {}, {}/{}'.format(j + 1, round(accuracy_matrix2[j,0]/accuracy_matrix2[j,1], 4),accuracy_matrix2[j,0],accuracy_matrix2[j,1]))
+
+    for j in range(beam_size):
         print('Top-{}: {}'.format(j + 1, round(np.mean(accuracy_matrix[:, j]), 4)))
-        print('Top-{}: {}'.format(j + 1, round(accuracy_matrix2[j,0]/accuracy_matrix2[j,1], 4)))
-
-
 if __name__ == '__main__':
 
     MyLogger.initialize_logFile()
