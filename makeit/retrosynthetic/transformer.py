@@ -478,10 +478,17 @@ def test_accuracy(retro_transformer,test_csv_path,beam_size):
         generations.append(generation)
 
     accuracy_matrix = np.zeros((len(ground_truths),  beam_size))
+    accuracy_matrix2=np.zeros(beam_size,2) #第0列命中数 第1列总数
     for i in range(len(ground_truths)):
         gt_i = canonical_smiles(ground_truths[i])
         generation_i = [canonical_smiles(gen) for gen in generations[i]]
         for j in range(beam_size):
+            topn=j+1
+            if len(generation_i)>=topn:
+                if gt_i in generation_i[:j + 1]:
+                    accuracy_matrix2[j,0]+=1
+                accuracy_matrix2[j,1]+=1
+
             if gt_i in generation_i[:j + 1]:
                 accuracy_matrix[i][j] = 1
 
@@ -490,6 +497,7 @@ def test_accuracy(retro_transformer,test_csv_path,beam_size):
 
     for j in range(beam_size):
         print('Top-{}: {}'.format(j + 1, round(np.mean(accuracy_matrix[:, j]), 4)))
+        print('Top-{}: {}'.format(j + 1, round(accuracy_matrix2[j,0]/accuracy_matrix2[j,1], 4)))
 
 
 if __name__ == '__main__':
