@@ -468,14 +468,23 @@ def test_accuracy(retro_transformer,test_csv_path,beam_size):
     from tqdm import tqdm
     output_path="retro_test_output"
     df=pd.read_csv(test_csv_path)
-    ground_truths=df["tgt_smiles"]
+    ground_truths=[]
     generations=[]
-    src_smiles_list=df["src_smiles"]
-    for src_smiles in tqdm(src_smiles_list):
+    src_smiles_list=[]
+    for idx,line in enumerate(df.iterrows()):
+        print(idx)
+        if idx>100:
+            break
+
+        src_smiles=line["src_smiles"]
+        tgt_smiles=line["tgt_smiles"]
 
         outcomes = retro_transformer.get_outcomes(src_smiles, beam_size, (gc.relevanceheuristic, gc.relevance))
         generation=[k["smiles"] for k in outcomes.return_top(n=beam_size)]
-        generations.append(generation)
+        if len(generation)==10:
+            generations.append(generation)
+            src_smiles_list.append(src_smiles)
+            ground_truths.append(tgt_smiles)
 
     accuracy_matrix = np.zeros((len(ground_truths),  beam_size))
     accuracy_matrix2=np.zeros(beam_size,2) #第0列命中数 第1列总数
@@ -506,7 +515,7 @@ if __name__ == '__main__':
     t = RetroTransformer()
     t.load(chiral=True, refs=False, rxns=True)
 
-    test_accuracy(t, "/root/Uni-Electrolyte/retrosynthesis/g2gretro/retro_test.csv", 1)
+    test_accuracy(t, "/root/Uni-Electrolyte/retrosynthesis/g2gretro/retro_test.csv", 10)
     exit()
 
     smiles="CCC12CC1(C)C(=O)O2"
