@@ -449,11 +449,57 @@ class RetroTransformer(TemplateTransformer):
             else:
                 yield template
 
+
+def canonical_smiles(smi):
+    """Canonicalize a SMILES without atom mapping"""
+    mol = Chem.MolFromSmiles(smi)
+    if mol is None:
+        return smi
+    else:
+        canonical_smi = Chem.MolToSmiles(mol)
+        # print('>>', canonical_smi)
+        if '.' in canonical_smi:
+            canonical_smi_list = canonical_smi.split('.')
+            canonical_smi_list = sorted(canonical_smi_list, key=lambda x: (len(x), x))
+            canonical_smi = '.'.join(canonical_smi_list)
+        return canonical_smi
+def test_accuracy(retro_transformer,test_csv_path,beam_size):
+    import pandas as pd
+    from tqdm import tqdm
+    output_path="retro_test_output"
+    df=pd.read_csv(test_csv_path)
+    ground_truths=df["tgt_smiles"]
+    generations=[]
+    src_smiles_list=df["src_smiles"]
+    for src_smiles in tqdm(src_smiles_list):
+
+        outcomes = retro_transformer.get_outcomes(src_smiles, beam_size, (gc.relevanceheuristic, gc.relevance))
+        generation=[k["smiles"] for k in outcomes.return_top(n=beam_size)]
+        generations.append(generation)
+
+    accuracy_matrix = np.zeros((len(ground_truths),  beam_size))
+    for i in range(len(ground_truths)):
+        gt_i = canonical_smiles(ground_truths[i])
+        generation_i = [canonical_smiles(gen) for gen in generations[i]]
+        for j in range(beam_size):
+            if gt_i in generation_i[:j + 1]:
+                accuracy_matrix[i][j] = 1
+
+    with open(output_path, 'wb') as f:
+        pickle.dump((ground_truths, generations), f)
+
+    for j in range(beam_size):
+        print('Top-{}: {}'.format(j + 1, round(np.mean(accuracy_matrix[:, j]), 4)))
+
+
 if __name__ == '__main__':
 
     MyLogger.initialize_logFile()
     t = RetroTransformer()
     t.load(chiral=True, refs=False, rxns=True)
+
+    test_accuracy(t, "/root/Uni-Electrolyte/retrosynthesis/g2gretro/retro_test.csv", 1)
+    exit()
 
     smiles="CCC12CC1(C)C(=O)O2"
     outcomes = t.get_outcomes(smiles, 100, (gc.relevanceheuristic, gc.relevance))
