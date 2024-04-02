@@ -625,7 +625,7 @@ class TreeBuilder:
                         item["smiles_split"]=g2g_precursors[tmp_i]["smiles_split"]
                         item['necessary_reagent']=g2g_precursors[tmp_i]['necessary_reagent']
                         item["score"]=g2g_precursors[tmp_i]["score"]
-                        if item["score"]>-0.15:
+                        if item["score"]>-0.13:
                             precursors.append(item)
                     print(len(precursors))
                     # print(old_precursors)

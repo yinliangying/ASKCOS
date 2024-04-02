@@ -191,9 +191,11 @@ for mol_idx in result_dict:
         head = path_dict
         q.append(head)
         rxn_smiles_list = []
+        rxn_smiles_name_list=[]
         while (len(q) != 0):
             point = q.popleft()
             if ">" in point["smiles"]:
+                rxn_smiles_name_list.append("molecule_%s_pathway_%s_rxn_id_%s_condition"%(mol_idx, path_id,len(rxn_smiles_list)))
                 rxn_smiles_list.append(point["smiles"])
             for cp in point["children"]:
                 q.append(cp)
@@ -258,6 +260,9 @@ for mol_idx in result_dict:
 
             # 保存拼接后的图片
             result.save('%s/molecule_%s/pathway_%s_%s.png' % (output_dir, mol_idx, mol_idx, path_id))
+
+        rxn_df=pd.DataFrame({"rxn_name":rxn_smiles_name_list,"smiles":rxn_smiles_list})
+        rxn_df.to_csv("%s/molecule_%s/rxn.csv" % (output_dir, mol_idx))
 
 with open("%s/finish"%(output_dir),"w") as fp:
     print("OK",file=fp)
