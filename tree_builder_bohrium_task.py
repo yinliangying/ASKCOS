@@ -184,7 +184,8 @@ def output_condiction_picture(rxn_smiles):
 
 q = deque()
 for mol_idx in result_dict:
-    os.system("mkdir %s/molecule_%s" % (output_dir, mol_idx))
+    if len(result_dict[mol_idx]["paths"])!=0:
+        os.system("mkdir %s/molecule_%s" % (output_dir, mol_idx))
     for path_id, path_dict in enumerate(result_dict[mol_idx]["paths"]): #广度遍历tree
 
         head = path_dict
