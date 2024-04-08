@@ -184,8 +184,8 @@ def output_condiction_picture(rxn_smiles):
 
 q = deque()
 for mol_idx in result_dict:
-    if len(result_dict[mol_idx]["paths"])!=0:
-        os.system("mkdir %s/molecule_%s" % (output_dir, mol_idx))
+    # if len(result_dict[mol_idx]["paths"])!=0:
+    #     os.system("mkdir %s/molecule_%s" % (output_dir, mol_idx))
     for path_id, path_dict in enumerate(result_dict[mol_idx]["paths"]): #广度遍历tree
 
         head = path_dict
@@ -206,7 +206,7 @@ for mol_idx in result_dict:
         elif len(rxn_smiles_list) == 1:
             if args.predicting_reaction_condition:
                 #condition prediction
-                os.system("mkdir %s/molecule_%s/pathway_%s_%s_condition" % (output_dir, mol_idx, mol_idx, path_id))
+                os.system("mkdir -p %s/molecule_%s/pathway_%s_%s_condition" % (output_dir, mol_idx, mol_idx, path_id))
                 condition_img,condition_result=output_condiction_picture(rxn_smiles_list[0])
                 condition_img.save("%s/molecule_%s/pathway_%s_%s_condition/rxn_0_condition.png" % (output_dir, mol_idx, mol_idx, path_id))
 
@@ -228,7 +228,7 @@ for mol_idx in result_dict:
             height = 300
             width_mol = 200
             if args.predicting_reaction_condition:
-                os.system("mkdir %s/molecule_%s/pathway_%s_%s_condition" % (output_dir, mol_idx, mol_idx, path_id))
+                os.system("mkdir -p %s/molecule_%s/pathway_%s_%s_condition" % (output_dir, mol_idx, mol_idx, path_id))
             for rxn_idx, rxn_smiles in enumerate(reversed(rxn_smiles_list)):
                 rxn = AllChem.ReactionFromSmarts(rxn_smiles, useSmiles=True)
                 img = Draw.ReactionToImage(rxn, subImgSize=(width_mol, height))  # 每个分子的尺寸 反应箭头也按一个分子算
