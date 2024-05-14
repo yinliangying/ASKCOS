@@ -16,7 +16,7 @@ from rdkit.Chem import Draw
 from PIL import Image, ImageDraw, ImageFont
 
 parser = ArgumentParser()
-parser.add_argument('--input_csv_file', type=str)
+parser.add_argument('--input_file', type=str)
 parser.add_argument('--output_dir', type=str)
 parser.add_argument("--predicting_reaction_condition", type=str)
 args = parser.parse_args()
@@ -25,7 +25,7 @@ if args.predicting_reaction_condition=="True":
 else:
     args.predicting_reaction_condition=False
 
-input_df = pd.read_csv(args.input_csv_file)
+
 #ID_tag=args.ID_tag
 output_dir = args.output_dir
 if os.path.exists(output_dir):
@@ -44,11 +44,8 @@ cont.load_nn_model(model_path=gc.NEURALNET_CONTEXT_REC['model_path'], info_path=
 
 result_dict = {}
 os.system("mkdir %s/tmp"%(output_dir))
-for idx, v in input_df.iterrows():
-    try:
-        smiles = v["smiles"]
-    except:
-        smiles=v["SMILES"]
+for idx, smiles in enumerate(open(args.input_file)):
+
     #
     # import pdb
     # pdb.set_trace()
