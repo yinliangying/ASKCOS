@@ -257,7 +257,7 @@ def main():
                     rxn_smiles=point["smiles"]
                     condition_result = cont.get_n_conditions(rxn_smiles, 10, with_smiles=False)
                     if condition_result:
-                        point["condition"] = condition_result
+                        point["condition_result"] = condition_result
                 for cp in point["children"]:
                     q.append(cp)
 
