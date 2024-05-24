@@ -156,6 +156,7 @@ def draw_pathway(result_dict,args,output_dir):
                         "mkdir -p %s/molecule_%s/pathway_%s_%s_condition" % (output_dir, mol_idx, mol_idx, path_id))
                 for rxn_idx, rxn_info in enumerate(reversed(rxn_info_list)):
                     rxn_smiles=rxn_info[0]
+                    condition_result=rxn_info[2]
                     rxn = AllChem.ReactionFromSmarts(rxn_smiles, useSmiles=True)
                     img = Draw.ReactionToImage(rxn, subImgSize=(width_mol, height_mol))  # 每个分子的尺寸 反应箭头也按一个分子算
                     img = img.resize((width, height_mol))
@@ -170,8 +171,8 @@ def draw_pathway(result_dict,args,output_dir):
                     pil_img_list.append(img)
 
                     # condition prediction
-                    if args.predicting_reaction_condition:
-                        condition_img  = output_condiction_picture(rxn_smiles)
+                    if True:#args.predicting_reaction_condition:
+                        condition_img  = output_condiction_picture(rxn_smiles,condition_result)
                         condition_img.save(
                             "%s/molecule_%s/pathway_%s_%s_condition/rxn_%s_condition.png" % (
                             output_dir, mol_idx, mol_idx, path_id, rxn_idx))
