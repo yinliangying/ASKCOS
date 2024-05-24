@@ -60,7 +60,7 @@ def output_condiction_picture(rxn_smiles,condition_result):
         temperature, solvent, reagents, catalyst, _, _ = condition_list
         condition_part_img_list = []
 
-        temperature_img = Image.new(pil_img_list[0].mode, (width_mol, height_mol), color=(0, 0, 0))  #
+        temperature_img = Image.new(pil_img_list[0].mode, (width_mol, height_mol), color=(255, 255, 255))  #
         draw = ImageDraw.Draw(temperature_img)
         draw.rectangle([(0, 0), temperature_img.size], fill=(255, 255, 255))
         text = "%s°C" % (int(temperature))
@@ -73,7 +73,7 @@ def output_condiction_picture(rxn_smiles,condition_result):
         for sth in (solvent, reagents, catalyst):
             mol = AllChem.MolFromSmiles(sth)
             if not mol:
-                sth_img = Image.new(pil_img_list[0].mode, (width_mol, height_mol), color=(0, 0, 0))  #
+                sth_img = Image.new(pil_img_list[0].mode, (width_mol, height_mol), color=(255, 255, 255))  #
                 draw = ImageDraw.Draw(sth_img)
                 draw.rectangle([(0, 0), sth_img.size], fill=(255,255,255))
                 text=""
@@ -90,7 +90,7 @@ def output_condiction_picture(rxn_smiles,condition_result):
             condition_part_img_list.append(sth_img)
 
         # 创建一个空白画布，用于拼接condition图片
-        condition_img = Image.new(pil_img_list[0].mode, (width, height_mol), color=(0, 0, 0))  #
+        condition_img = Image.new(pil_img_list[0].mode, (width, height_mol), color=(255, 255, 255))  #
         # 在画布上拼接图片
         for img_idx, img in enumerate(condition_part_img_list):
             condition_img.paste(img, (width_mol * img_idx, 0))
@@ -100,7 +100,7 @@ def output_condiction_picture(rxn_smiles,condition_result):
     # 创建一个空白画布，用于拼接图片
     result_width = width  # 图片拼接在一起
     result_height = height_mol * len(pil_img_list)
-    condition_img_result = Image.new(pil_img_list[0].mode, (result_width, result_height),color=(0,0,0))  #
+    condition_img_result = Image.new(pil_img_list[0].mode, (result_width, result_height),color=(255, 255, 255))  #
     # 在画布上拼接图片
     for img_idx, img in enumerate(pil_img_list):
         condition_img_result.paste(img, (0, height_mol * img_idx))
@@ -134,20 +134,6 @@ def draw_pathway(result_dict,args,output_dir):
 
             if len(rxn_info_list) == 0:
                 continue
-            elif len(rxn_info_list) == 1:
-                if True:#args.predicting_reaction_condition:
-                    # condition prediction
-                    os.system(
-                        "mkdir -p %s/molecule_%s/pathway_%s_%s_condition" % (output_dir, mol_idx, mol_idx, path_id))
-                    condition_img = output_condiction_picture(rxn_info_list[0][0],rxn_info_list[0][2])
-                    condition_img.save("%s/molecule_%s/pathway_%s_%s_condition/rxn_0_condition.png" % (
-                    output_dir, mol_idx, mol_idx, path_id))
-
-                rxn = AllChem.ReactionFromSmarts(rxn_info_list[0][0], useSmiles=True)
-                img = Draw.ReactionToImage(rxn, subImgSize=(width_mol, height_mol))
-                img = img.resize((width, height_mol))
-                img.save('%s/molecule_%s/pathway_%s_%s.png' % (output_dir, mol_idx, mol_idx, path_id))
-
 
             else:
                 pil_img_list = []
@@ -181,7 +167,7 @@ def draw_pathway(result_dict,args,output_dir):
                 # 创建一个空白画布，用于拼接图片
                 result_width = width  # 图片拼接在一起
                 result_height = height_mol * len(pil_img_list)
-                result = Image.new(pil_img_list[0].mode, (result_width, result_height), color=(0, 0, 0))  #
+                result = Image.new(pil_img_list[0].mode, (result_width, result_height), color=(255, 255, 255))  #
 
                 # 在画布上拼接图片
                 for img_idx, img in enumerate(pil_img_list):
