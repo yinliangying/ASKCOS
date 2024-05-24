@@ -144,7 +144,8 @@ def draw_pathway(result_dict,args,output_dir):
                     output_dir, mol_idx, mol_idx, path_id))
 
                 rxn = AllChem.ReactionFromSmarts(rxn_info_list[0][0], useSmiles=True)
-                img = Draw.ReactionToImage(rxn, subImgSize=(width, height_mol))
+                img = Draw.ReactionToImage(rxn, subImgSize=(width_mol, height_mol))
+                img = img.resize((width, height_mol))
                 img.save('%s/molecule_%s/pathway_%s_%s.png' % (output_dir, mol_idx, mol_idx, path_id))
 
 
