@@ -120,32 +120,30 @@ def draw_pathway(result_dict,args,output_dir):
             q = deque()
             head = path_dict
             q.append(head)
-            rxn_smiles_list = []
-            rxn_smiles_name_list = []
-            rxn_condition_result_list=[]
+            rxn_info_list = []
+
             while (len(q) != 0):
                 point = q.popleft()
                 if ">" in point["smiles"]:
-                    rxn_smiles_name_list.append(
-                        "molecule_%s_pathway_%s_rxn_id_%s_condition" % (mol_idx, path_id, len(rxn_smiles_list)))
-                    rxn_smiles_list.append(point["smiles"])
-                    rxn_condition_result_list.append(point["condition_result"])
+
+                    #rxn_condition_dir_name="molecule_%s_pathway_%s_rxn_id_%s_condition" % (mol_idx, path_id, len(rxn_info_list))
+                    rxn_info_list.append((point["smiles"],"",point["condition_result"]))
                 for cp in point["children"]:
                     q.append(cp)
             # print()
 
-            if len(rxn_smiles_list) == 0:
+            if len(rxn_info_list) == 0:
                 continue
-            elif len(rxn_smiles_list) == 1:
+            elif len(rxn_info_list) == 1:
                 if True:#args.predicting_reaction_condition:
                     # condition prediction
                     os.system(
                         "mkdir -p %s/molecule_%s/pathway_%s_%s_condition" % (output_dir, mol_idx, mol_idx, path_id))
-                    condition_img = output_condiction_picture(rxn_smiles_list[0],rxn_condition_result_list[0])
+                    condition_img = output_condiction_picture(rxn_info_list[0][0],rxn_info_list[0][2])
                     condition_img.save("%s/molecule_%s/pathway_%s_%s_condition/rxn_0_condition.png" % (
                     output_dir, mol_idx, mol_idx, path_id))
 
-                rxn = AllChem.ReactionFromSmarts(rxn_smiles_list[0], useSmiles=True)
+                rxn = AllChem.ReactionFromSmarts(rxn_info_list[0][0], useSmiles=True)
                 img = Draw.ReactionToImage(rxn, subImgSize=(width, height_mol))
                 img.save('%s/molecule_%s/pathway_%s_%s.png' % (output_dir, mol_idx, mol_idx, path_id))
 
@@ -156,7 +154,8 @@ def draw_pathway(result_dict,args,output_dir):
                 if True:#args.predicting_reaction_condition:
                     os.system(
                         "mkdir -p %s/molecule_%s/pathway_%s_%s_condition" % (output_dir, mol_idx, mol_idx, path_id))
-                for rxn_idx, rxn_smiles in enumerate(reversed(rxn_smiles_list)):
+                for rxn_idx, rxn_info in enumerate(reversed(rxn_info_list)):
+                    rxn_smiles=rxn_info[0]
                     rxn = AllChem.ReactionFromSmarts(rxn_smiles, useSmiles=True)
                     img = Draw.ReactionToImage(rxn, subImgSize=(width_mol, height_mol))  # 每个分子的尺寸 反应箭头也按一个分子算
                     img = img.resize((width, height_mol))
@@ -189,8 +188,8 @@ def draw_pathway(result_dict,args,output_dir):
                 # 保存拼接后的图片
                 result.save('%s/molecule_%s/pathway_%s_%s.png' % (output_dir, mol_idx, mol_idx, path_id))
 
-            rxn_df = pd.DataFrame({"rxn_name": rxn_smiles_name_list, "smiles": rxn_smiles_list})
-            rxn_df.to_csv("%s/molecule_%s/rxn.csv" % (output_dir, mol_idx))
+
+
 
 def main():
     parser = ArgumentParser()
