@@ -36,7 +36,7 @@ def output_condiction_picture(rxn_smiles,condition_result):
 
     #拼接条件title
     condition_part_img_list = []
-    for sth in ("temperature","solvent", "reagents", "catalyst"):
+    for sth in ("Temperature","Solvent", "Reagents", "Catalyst"):
         sth_img = Image.new(pil_img_list[0].mode, (width_mol, height_mol), color=(0, 0, 0))  #
         draw = ImageDraw.Draw(sth_img)
         draw.rectangle([(0, 0), sth_img.size], fill=(255, 255, 255))
