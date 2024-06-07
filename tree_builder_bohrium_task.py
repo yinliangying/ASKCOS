@@ -23,10 +23,11 @@ width = 1200
 height_mol = 300
 width_mol = 300
 
+font_file="DejaVuSans.ttf" # "arial.ttf" for win
 def output_condiction_picture(rxn_smiles,condition_result):
 
     pil_img_list = []
-    font_file="DejaVuSans.ttf" # "arial.ttf" for win
+
 
     # 反应的picture
     rxn = AllChem.ReactionFromSmarts(rxn_smiles, useSmiles=True)
@@ -121,13 +122,15 @@ def draw_pathway(result_dict,args,output_dir):
             head = path_dict
             q.append(head)
             rxn_info_list = []
-
+            price_dict = {}
             while (len(q) != 0):
                 point = q.popleft()
                 if ">" in point["smiles"]:
 
                     #rxn_condition_dir_name="molecule_%s_pathway_%s_rxn_id_%s_condition" % (mol_idx, path_id, len(rxn_info_list))
                     rxn_info_list.append((point["smiles"],"",point["condition_result"]))
+                if "ppg" in point:
+                    price_dict[point["smiles"]] = point["ppg"]
                 for cp in point["children"]:
                     q.append(cp)
             # print()
@@ -147,6 +150,18 @@ def draw_pathway(result_dict,args,output_dir):
                     rxn = AllChem.ReactionFromSmarts(rxn_smiles, useSmiles=True)
                     img = Draw.ReactionToImage(rxn, subImgSize=(width_mol, height_mol))  # 每个分子的尺寸 反应箭头也按一个分子算
                     img = img.resize((width, height_mol))
+
+                    product_smiles=rxn_smiles.split(">")[-1]
+                    if product_smiles in price_dict:
+                        price = float(price_dict[product_smiles])
+                        text="%.1f/g"%(price)
+                        draw = ImageDraw.Draw(img)
+
+                        position = (width-100,height_mol-50 )  # 文字的起始位置 (x, y)
+                        font = ImageFont.truetype(font_file, 24)  # 使用指定字体和大小
+                        color = (0, 0, 0)  # 文字颜色，RGB 格式
+                        draw.text(position, text, font=font, fill=color)
+
                     img.save("%s/tmp/tmp_%s_%s_%s.png" % (output_dir, mol_idx, path_id, rxn_idx))
                     # d2d = Draw.MolDraw2DCairo(800, 300)
                     # d2d.DrawReaction(rxn)
