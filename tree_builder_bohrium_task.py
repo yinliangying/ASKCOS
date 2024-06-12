@@ -123,14 +123,17 @@ def draw_pathway(result_dict,args,output_dir):
             q.append(head)
             rxn_info_list = []
             price_dict = {}
+            product_set = set()
             while (len(q) != 0):
                 point = q.popleft()
                 if ">" in point["smiles"]:
 
                     #rxn_condition_dir_name="molecule_%s_pathway_%s_rxn_id_%s_condition" % (mol_idx, path_id, len(rxn_info_list))
                     rxn_info_list.append((point["smiles"],"",point["condition_result"]))
+                    product=point["smiles"].split(">")[-1]
+
                 if "ppg" in point:
-                    price_dict[point["smiles"]] = point["ppg"]
+                    product_set.add(product)
                 for cp in point["children"]:
                     q.append(cp)
             # print()
@@ -155,11 +158,11 @@ def draw_pathway(result_dict,args,output_dir):
                     reactant_smiles_list=reactant_smiles_str.split(".")
                     tmp_width_mol=width/(2+len(reactant_smiles_list))
                     for reactant_idx,reactant_smiles in enumerate(reactant_smiles_list):
-                        if reactant_smiles in price_dict:
+                        if reactant_smiles in price_dict and reactant_smiles not in product_set:
                             price = float(price_dict[reactant_smiles])
                             if price==0:
                                 price+=0.1
-                            text="%.1f/g"%(price)
+                            text="%.1f$/g"%(price)
                             draw = ImageDraw.Draw(img)
 
                             position = (100+reactant_idx*tmp_width_mol,height_mol-50 )  # 文字的起始位置 (x, y)
