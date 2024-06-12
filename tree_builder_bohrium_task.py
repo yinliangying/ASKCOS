@@ -131,9 +131,9 @@ def draw_pathway(result_dict,args,output_dir):
                     #rxn_condition_dir_name="molecule_%s_pathway_%s_rxn_id_%s_condition" % (mol_idx, path_id, len(rxn_info_list))
                     rxn_info_list.append((point["smiles"],"",point["condition_result"]))
                     product=point["smiles"].split(">")[-1]
-
-                if "ppg" in point:
                     product_set.add(product)
+                if "ppg" in point:
+                    price_dict[point["smiles"]] = point["ppg"]
                 for cp in point["children"]:
                     q.append(cp)
             # print()
