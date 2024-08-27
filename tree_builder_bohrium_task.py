@@ -157,18 +157,23 @@ def draw_pathway(result_dict,args,output_dir):
                     reactant_smiles_str=rxn_smiles.split(">")[0]
                     reactant_smiles_list=reactant_smiles_str.split(".")
                     tmp_width_mol=width/(2+len(reactant_smiles_list))
+                    reactant_price_list=[]
                     for reactant_idx,reactant_smiles in enumerate(reactant_smiles_list):
                         if reactant_smiles in price_dict and reactant_smiles not in product_set:
                             price = float(price_dict[reactant_smiles])
                             if price==0:
                                 price+=0.1
-                            text="%.1f$/g"%(price)
+                            price_text="%.1f$/g"%(price)
                             draw = ImageDraw.Draw(img)
 
                             position = (100+reactant_idx*tmp_width_mol,height_mol-50 )  # 文字的起始位置 (x, y)
                             font = ImageFont.truetype(font_file, 24)  # 使用指定字体和大小
                             color = (0, 0, 0)  # 文字颜色，RGB 格式
-                            draw.text(position, text, font=font, fill=color)
+                            draw.text(position, price_text, font=font, fill=color)
+                        else:
+                            price_text=""
+                        reactant_price_list.append(price_text)
+                    rxn_info_list[rxn_idx][1]=reactant_price_list
 
                     img.save("%s/tmp/tmp_%s_%s_%s.png" % (output_dir, mol_idx, path_id, rxn_idx))
                     # d2d = Draw.MolDraw2DCairo(800, 300)
@@ -186,6 +191,9 @@ def draw_pathway(result_dict,args,output_dir):
                         condition_img.save(
                             "%s/molecule_%s/pathway_%s_%s_condition/rxn_%s_condition.png" % (
                             output_dir, mol_idx, mol_idx, path_id, rxn_idx))
+                        with open( "%s/molecule_%s/pathway_%s_%s_condition/rxn_%s_condition.json" % (
+                            output_dir, mol_idx, mol_idx, path_id, rxn_idx),"w") as fp:
+                            json.dump(condition_result,fp)
 
                 # 创建一个空白画布，用于拼接图片
                 result_width = width  # 图片拼接在一起
@@ -195,7 +203,8 @@ def draw_pathway(result_dict,args,output_dir):
                 # 在画布上拼接图片
                 for img_idx, img in enumerate(pil_img_list):
                     result.paste(img, (0, height_mol * img_idx))
-
+                with open('%s/molecule_%s/pathway_%s_%s.json' % (output_dir, mol_idx, mol_idx, path_id),"w") as fp:
+                    json.dump(rxn_info_list,fp)
                 # 保存拼接后的图片
                 result.save('%s/molecule_%s/pathway_%s_%s.png' % (output_dir, mol_idx, mol_idx, path_id))
 
