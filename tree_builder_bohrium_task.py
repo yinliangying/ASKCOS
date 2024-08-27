@@ -143,7 +143,7 @@ def draw_pathway(result_dict,args,output_dir):
 
             else:
                 pil_img_list = []
-
+                pathway_output_list=[]
                 if True:#args.predicting_reaction_condition:
                     os.system(
                         "mkdir -p %s/molecule_%s/pathway_%s_%s_condition" % (output_dir, mol_idx, mol_idx, path_id))
@@ -173,16 +173,9 @@ def draw_pathway(result_dict,args,output_dir):
                         else:
                             price_text=""
                         reactant_price_list.append(price_text)
-                    rxn_info_list[rxn_idx][1]=reactant_price_list
 
+                    pathway_output_list.append([rxn_smiles, reactant_price_list])
                     img.save("%s/tmp/tmp_%s_%s_%s.png" % (output_dir, mol_idx, path_id, rxn_idx))
-                    # d2d = Draw.MolDraw2DCairo(800, 300)
-                    # d2d.DrawReaction(rxn)
-                    # png = d2d.GetDrawingText()
-                    # open("%s/tmp_%s_%s_%s.png"%(tmp_dir,molID,path_id,rxn_idx), 'wb+').write(png)
-                    # img=Draw.ReactionToImage(rxn,subImgSize=(200, 200))
-                    # img.save("./data/rxn_draw/%s_%s_%s.png"%(molID,path_id,rxn_idx))
-
                     pil_img_list.append(img)
 
                     # condition prediction
@@ -204,7 +197,7 @@ def draw_pathway(result_dict,args,output_dir):
                 for img_idx, img in enumerate(pil_img_list):
                     result.paste(img, (0, height_mol * img_idx))
                 with open('%s/molecule_%s/pathway_%s_%s.json' % (output_dir, mol_idx, mol_idx, path_id),"w") as fp:
-                    json.dump(rxn_info_list,fp)
+                    json.dump(pathway_output_list,fp)
                 # 保存拼接后的图片
                 result.save('%s/molecule_%s/pathway_%s_%s.png' % (output_dir, mol_idx, mol_idx, path_id))
 
