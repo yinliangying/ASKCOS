@@ -186,7 +186,7 @@ def draw_pathway(result_dict,args,output_dir):
                             output_dir, mol_idx, mol_idx, path_id, rxn_idx))
                         with open( "%s/molecule_%s/pathway_%s_%s_condition/rxn_%s_condition.json" % (
                             output_dir, mol_idx, mol_idx, path_id, rxn_idx),"w") as fp:
-                            json.dump(condition_result,fp)
+                            json.dump([rxn_smiles,condition_result],fp)
 
                 # 创建一个空白画布，用于拼接图片
                 result_width = width  # 图片拼接在一起
